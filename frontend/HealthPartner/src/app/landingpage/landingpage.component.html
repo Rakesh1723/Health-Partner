@@ -1,0 +1,96 @@
+<header class="header">
+  <div class="logo">HealthPartner</div>
+  <nav class="nav-links">
+    <a (click)="scrollToTop()" class="nav-link">Home</a>
+    <a (click)="scrollToSection('about')" class="nav-link">About</a>
+    <a (click)="scrollToSection('contact')" class="nav-link">Contact</a>
+  </nav>
+  <div class="auth-buttons">
+    <a routerLink="/login" routerLinkActive="active" class="auth-btn login-btn">Login</a>
+    <a routerLink="/signup" routerLinkActive="active" class="auth-btn signup-btn">Sign Up</a>
+  </div>
+</header>
+
+<div class="landing-container">
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Transform Your Life<br>One Step at a Time</h1>
+      <p class="hero-subtitle">
+        Your journey to a healthier lifestyle begins here. Track fitness, monitor nutrition,
+        and embrace wellness with your personal health companion. Stay motivated
+        every step of the way.
+      </p>
+      <div class="hero-buttons">
+        <a routerLink="/signup" class="hero-btn primary-btn">Get Started Free</a>
+        <a routerLink="/about" class="hero-btn secondary-btn">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+ 
+  <section class="features-section">
+    <div class="feature-card">
+      <i class="feature-icon fas fa-dumbbell"></i>
+      <h2 class="feature-title">Workout Tracking</h2>
+      <p class="feature-description">
+        Log your exercises, track your sets and reps, and monitor your progress over time with detailed analytics.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <i class="feature-icon fas fa-utensils"></i>
+      <h2 class="feature-title">Diet Monitoring</h2>
+      <p class="feature-description">
+        Track your daily nutrition, plan balanced meals, and maintain a healthy diet to support your fitness goals.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <i class="feature-icon fas fa-brain"></i>
+      <h2 class="feature-title">Mental Wellness</h2>
+      <p class="feature-description">
+        Focus on your mental health alongside physical fitness for a truly balanced approach to well-being.
+      </p>
+    </div>
+  </section>
+
+  
+  <div class="sections-grid">
+    <section id="about" class="about-section">
+      <h2 class="about-title">About Us</h2>
+      <p class="about-description">
+        We empower you to take charge of your health by seamlessly tracking your fitness activities
+        and diet. By staying consistent and informed, you can not only improve your well-being but
+        also reduce expenses associated with poor health and fitness.
+      </p>
+    </section>
+
+
+    <section class="cta-section">
+      <h2 class="cta-title">Ready to Transform Your Health?</h2>
+      <a routerLink="/signup" class="cta-button">Start Your Journey</a>
+    </section>
+
+  
+    <section id="contact" class="contact-section">
+      <h2 class="contact-title">Contact Us</h2>
+      <div class="contact-content">
+        <div class="contact-info">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@healthpartner.com" target="_blank"
+              style="text-decoration: inherit; color: inherit;"><p>support&#64;healthpartner.com</p></a>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <p>+1 (555) 123-4567</p>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <p>Room 7 UST Trivandrum</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

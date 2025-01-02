@@ -1,0 +1,119 @@
+<div class="main-container">
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <span class="app-name">HealthPartner</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="signup-container">
+    <div class="signup-box">
+      <h2>Create Account</h2>
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="userName">First Name</label>
+            <input type="text" id="userName" formControlName="userName" class="form-control" placeholder="Enter first name" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <div class="error-message" *ngIf="signupForm.get('userName')?.touched && signupForm.get('userName')?.invalid">
+              First name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="surName">Last Name</label>
+            <input type="text" id="surName" formControlName="surName" class="form-control" placeholder="Enter last name" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <div class="error-message" *ngIf="signupForm.get('surName')?.touched && signupForm.get('surName')?.invalid">
+              Last name is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="emailId">Email</label>
+          <input type="email" id="emailId" formControlName="emailId" class="form-control" placeholder="Enter email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <div class="error-message" *ngIf="signupForm.get('emailId')?.touched && signupForm.get('emailId')?.invalid">
+            Please enter a valid email
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" formControlName="age" class="form-control" placeholder="Enter age" autocomplete="off">
+            <div class="error-message" *ngIf="signupForm.get('age')?.touched && signupForm.get('age')?.invalid">
+              Please enter a valid age
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" formControlName="gender" class="form-control">
+              <option value="">Select gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="height">Height (m)</label>
+            <input type="number" id="height" formControlName="height" class="form-control" placeholder="Enter height">
+          </div>
+
+          <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" formControlName="weight" class="form-control" placeholder="Enter weight">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-input">
+              <input type="password"
+                     id="password" 
+                     formControlName="password" 
+                     class="form-control" 
+                     placeholder="Enter password"
+                     autocomplete="new-password"
+                     autocapitalize="off"
+                     autocorrect="off">
+            </div>
+            <div class="password-strength" *ngIf="signupForm.get('password')?.value">
+              <div class="strength-bar" [class]="passwordStrength.strength">
+                <div class="bar"></div>
+                <span class="strength-text">{{passwordStrength.strength}} password</span>
+              </div>
+            </div>
+            <div class="error-message" *ngIf="signupForm.get('password')?.touched && !signupForm.get('password')?.value">
+              Password is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="password-input">
+              <input type="password"
+                     id="confirmPassword" 
+                     formControlName="confirmPassword" 
+                     class="form-control" 
+                     placeholder="Confirm password"
+                     autocomplete="new-password"
+                     autocapitalize="off"
+                     autocorrect="off">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="signupForm.invalid">Sign Up</button>
+        
+        <div class="login-link">
+          Already have an account? <a routerLink="/login">Login here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

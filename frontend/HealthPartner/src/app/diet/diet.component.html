@@ -1,0 +1,439 @@
+<div class="main-container">
+  <app-nav-bar></app-nav-bar>
+
+  <div class="content-container">
+   
+    <div class="search-section">
+     
+      <div class="goal-settings">
+        <button class="goal-toggle" (click)="toggleGoalSettings()">
+          <i class="fas fa-bullseye"></i>
+          <span>Goal: {{ hasActiveGoal ? targetCalories + ' cal' : 'Not Set' }}</span>
+        </button>
+        
+        <div class="goal-popup" [class.show]="isGoalSettingsOpen">
+          <div class="goal-options" *ngIf="!showGoalInput">
+            <button class="goal-option" (click)="showSetGoal()">
+              <i class="fas fa-plus-circle me-2"></i>Set Goal
+            </button>
+            <button class="goal-option" (click)="unsetGoal()">
+              <i class="fas fa-times-circle me-2"></i>Unset Goal
+            </button>
+          </div>
+          
+          <div class="goal-input-container" *ngIf="showGoalInput">
+            <div class="goal-inputs">
+              <div class="goal-input">
+                <label>Calories</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="targetCalories"
+                  placeholder="Enter target calories">
+              </div>
+              <div class="goal-input">
+                <label>Protein (gm)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="targetProtein"
+                  placeholder="Enter target protein">
+              </div>
+              <div class="goal-input">
+                <label>Carbs (gm)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="targetCarbs"
+                  placeholder="Enter target carbs">
+              </div>
+              <div class="goal-input">
+                <label>Fat (gm)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="targetFat"
+                  placeholder="Enter target fat">
+              </div>
+            </div>
+            <div class="goal-actions">
+              <button class="goal-action-btn save" (click)="saveGoalSettings()">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="goal-action-btn" (click)="cancelSetGoal()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="day-selector" *ngIf="selectedPeriod === 'Today'">
+        
+        <div class="selected-date" *ngIf="selectedDate">
+          {{ selectedDate | date:'fullDate' }}
+        </div>
+        <div class="week-dates">
+          <div *ngFor="let day of weekDays" 
+               class="day-button" 
+               [class.active]="isSameDay(day.date, selectedDate)"
+               (click)="selectDay(day.date)">
+            <span class="day-name">{{day.name}}</span>
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="search-controls">
+       
+        <div class="search-dropdown">
+          <button class="search-toggle" (click)="toggleSearchOptions($event)">
+            <i class="fas fa-filter"></i>
+            <span>{{ selectedPeriod }}</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="search-options" [class.show]="isSearchOpen">
+            <div class="option" (click)="selectPeriod('Today')">Today</div>
+            <div class="option" (click)="selectPeriod('Weekly')">Weekly</div>
+            <div class="option" (click)="selectPeriod('Monthly')">Monthly</div>
+            <div class="option" (click)="selectPeriod('Yearly')">Yearly</div>
+            <div class="option" (click)="selectPeriod('Custom')">Custom Date</div>
+          </div>
+        </div>
+
+        
+        <div class="date-range" *ngIf="selectedPeriod === 'Custom'">
+          <div class="date-input-container">
+            <input 
+              type="date" 
+              [(ngModel)]="startDate" 
+              class="date-input"
+              [max]="endDate || today"
+              (click)="$event.stopPropagation()">
+            <i class="fas fa-calendar" (click)="openStartDatePicker($event)"></i>
+          </div>
+          <span>to</span>
+          <div class="date-input-container">
+            <input 
+              type="date" 
+              [(ngModel)]="endDate" 
+              class="date-input"
+              [min]="startDate"
+              [max]="today"
+              (click)="$event.stopPropagation()">
+            <i class="fas fa-calendar" (click)="openEndDatePicker($event)"></i>
+          </div>
+          <button class="search-btn" (click)="searchLogs()">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-egg"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Protein' : 'Avg Protein' }}</h3>
+          <p class="card-value">{{ viewType === 'daily' ? totalProtein : averageProtein }}<span class="unit">gm</span></p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="proteinProgress"
+                   [ngClass]="getProgressLevel(proteinProgress)"
+                   [class.empty]="totalProtein === 0">
+                <span class="progress-text">
+                  {{totalProtein > 0 ? proteinProgress + '% of ' + targetProtein + ' gm goal' : '0 of ' + targetProtein + ' gm goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-bread-slice"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Carbs' : 'Avg Carbs' }}</h3>
+          <p class="card-value">{{ viewType === 'daily' ? totalCarbs : averageCarbs }}<span class="unit">gm</span></p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="carbsProgress"
+                   [ngClass]="getProgressLevel(carbsProgress)"
+                   [class.empty]="totalCarbs === 0">
+                <span class="progress-text">
+                  {{totalCarbs > 0 ? carbsProgress + '% of ' + targetCarbs + ' gm goal' : '0 of ' + targetCarbs + ' gm goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-cheese"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Fat' : 'Avg Fat' }}</h3>
+          <p class="card-value">{{ viewType === 'daily' ? totalFat : averageFat }}<span class="unit">gm</span></p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="fatProgress"
+                   [ngClass]="getProgressLevel(fatProgress)"
+                   [class.empty]="totalFat === 0">
+                <span class="progress-text">
+                  {{totalFat > 0 ? fatProgress + '% of ' + targetFat + ' gm goal' : '0 of ' + targetFat + ' gm goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Calories' : 'Avg Calories' }}</h3>
+          <p class="card-value">{{ viewType === 'daily' ? totalCalories : averageCalories }} cal</p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="calorieProgress"
+                   [ngClass]="getProgressLevel(calorieProgress)"
+                   [class.empty]="totalCalories === 0">
+                <span class="progress-text">
+                  {{totalCalories > 0 ? calorieProgress + '% of ' + targetCalories + ' cal goal' : '0 of ' + targetCalories + ' cal goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!hasLogs" class="no-entries-box">
+      <p>No diet entries found for this period</p>
+    </div>
+
+   
+    <div class="logs-grid">
+      <div class="log-tile" *ngFor="let log of dietLogs">
+        <div class="meal-info">
+          <div class="meal-type">
+            <i class="fas" [ngClass]="getMealTypeIcon(log.mealType)"></i>
+            <span>{{log.mealType}}</span>
+          </div>
+          
+          <div class="log-stats">
+            <div class="stats-row main-row">
+              <div class="food-items">
+                <span class="field-label">Food Items</span>
+                <div class="food-items-list">
+                  <span class="food-item" *ngFor="let item of log.foodItems">{{item}}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stats-row macros-row">
+              <div class="stat">
+                <span class="field-label">Protein</span>
+                <div class="stat-value">
+                  <i class="fas fa-egg"></i>
+                  <span>{{log.protein}}<span class="unit">gm</span></span>
+                </div>
+              </div>
+              
+              <div class="stat">
+                <span class="field-label">Carbs</span>
+                <div class="stat-value">
+                  <i class="fas fa-bread-slice"></i>
+                  <span>{{log.carbs}}<span class="unit">gm</span></span>
+                </div>
+              </div>
+              
+              <div class="stat">
+                <span class="field-label">Fat</span>
+                <div class="stat-value">
+                  <i class="fas fa-cheese"></i>
+                  <span>{{log.fat}}<span class="unit">gm</span></span>
+                </div>
+              </div>
+
+              <div class="stat">
+                <span class="field-label">Calories</span>
+                <div class="stat-value">
+                  <i class="fas fa-fire"></i>
+                  <span>{{log.caloriesConsumed}}<span class="unit">cal</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="log-actions">
+          <span class="log-date">{{log.createdAt | date:'mediumDate'}}</span>
+          <div class="action-buttons">
+            <button class="edit-btn" (click)="openEditModal(log)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-btn" (click)="deleteDietLog(log.logId)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <button class="floating-add-btn" (click)="openAddModal()">
+      <i class="fas fa-plus"></i>
+    </button>
+  </div>
+</div>
+
+
+<div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="logModalLabel">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" [ngClass]="{'success': showSuccessView}">
+        <h5 class="modal-title" id="logModalLabel">
+          <i class="fas fa-utensils me-2"></i>
+          {{showSuccessView ? (isEditing ? 'Meal Updated' : 'Meal Added') : (isEditing ? 'Edit Meal' : 'Add New Meal')}}
+        </h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+
+     
+      <div class="modal-body py-2" *ngIf="showSuccessView && savedMeal">
+        <div class="meal-details">
+          <div class="detail-item">
+            <i class="fas" [ngClass]="getMealTypeIcon(savedMeal.mealType)"></i>
+            <span class="detail-label">Meal Type:</span>
+            <span class="detail-value">{{savedMeal.mealType}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-list"></i>
+            <span class="detail-label">Food Items:</span>
+            <div class="food-items-list">
+              <span class="food-item" *ngFor="let item of savedMeal.foodItems">{{item}}</span>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-fire"></i>
+            <span class="detail-label">Calories:</span>
+            <span class="detail-value">{{savedMeal.caloriesConsumed}} cal</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-egg"></i>
+            <span class="detail-label">Protein:</span>
+            <span class="detail-value">{{savedMeal.protein}} g</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-bread-slice"></i>
+            <span class="detail-label">Carbs:</span>
+            <span class="detail-value">{{savedMeal.carbs}} g</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-cheese"></i>
+            <span class="detail-label">Fat:</span>
+            <span class="detail-value">{{savedMeal.fat}} g</span>
+          </div>
+          <div class="log-date mt-2 text-end">
+            {{savedMeal.createdAt | date:'mediumDate'}}
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="modal-body" *ngIf="!showSuccessView">
+        <form [formGroup]="logForm">
+          <div class="form-group">
+            <label>
+              <i class="fas fa-utensils me-2"></i>
+              Meal Type
+            </label>
+            <select class="form-control" formControlName="mealType">
+              <option *ngFor="let type of mealTypes" [value]="type">
+                {{type}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-list me-2"></i>
+              Food Item
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   formControlName="foodItem" 
+                   placeholder="Example: 1 cup of rice and 100 gm chicken">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-sticky-note me-2"></i>
+              Notes
+            </label>
+            <textarea class="form-control" formControlName="notes" placeholder="Add any additional notes here..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-calendar me-2"></i>
+              Date
+            </label>
+            <input type="date" 
+                   class="form-control" 
+                   formControlName="logDate"
+                   [max]="maxDate"
+                   [disabled]="isEditing"
+                   [class.disabled]="isEditing"
+                   placeholder="Select date">
+            <div class="invalid-feedback" *ngIf="logForm.get('logDate')?.errors?.['required']">
+              Date is required
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          <i class="fas fa-times me-2"></i>
+          {{showSuccessView ? 'Close' : 'Cancel'}}
+        </button>
+        <button type="button" 
+                class="btn btn-primary" 
+                (click)="saveLog()"
+                *ngIf="!showSuccessView"
+                [disabled]="!logForm.valid || isCalculatingNutrition">
+          <i class="fas fa-spinner fa-spin me-2" *ngIf="isCalculatingNutrition"></i>
+          <i class="fas" *ngIf="!isCalculatingNutrition" [ngClass]="isEditing ? 'fa-save' : 'fa-plus'"></i>
+          <span class="ms-2">{{isCalculatingNutrition ? 'Calculating...' : (isEditing ? 'Update' : 'Save')}}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="alert-container" 
+     *ngIf="showAlert" 
+     [ngClass]="alertType">
+    <i class="fas" 
+       [ngClass]="{
+         'fa-check-circle': alertType === 'success',
+         'fa-info-circle': alertType === 'info',
+         'fa-exclamation-circle': alertType === 'error'
+       }">
+    </i>
+    <span class="alert-message">{{ alertMessage }}</span>
+</div>

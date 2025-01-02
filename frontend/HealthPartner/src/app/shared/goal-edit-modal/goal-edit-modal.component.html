@@ -1,0 +1,84 @@
+<div class="modal-backdrop" *ngIf="show" (click)="onClose()"></div>
+<div class="modal-overlay" *ngIf="show">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ currentGoal ? 'Update Goal' : 'Set New Goal' }}</h2>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Goal Type</label>
+        <select [ngModel]="goalType" 
+                name="goalType" 
+                class="form-control" 
+                disabled>
+          <option [value]="GoalType.WEIGHT_LOSS">Weight Loss</option>
+          <option [value]="GoalType.WEIGHT_GAIN">Weight Gain</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Current Weight (kg)</label>
+        <input type="number" 
+               [(ngModel)]="goalData.currentWeight" 
+               name="currentWeight" 
+               class="form-control" 
+               required
+               min="0"
+               step="0.1">
+        <div class="validation-message" *ngIf="goalData.currentWeight && goalData.targetWeight && !validateWeights()">
+          {{getWeightValidationMessage()}}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Target Weight (kg)</label>
+        <input type="number" 
+               [(ngModel)]="goalData.targetWeight" 
+               name="targetWeight" 
+               class="form-control" 
+               required
+               min="0"
+               step="0.1">
+        <div class="validation-message" *ngIf="goalData.currentWeight && goalData.targetWeight && !validateWeights()">
+          {{getWeightValidationMessage()}}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="goalData.description" 
+                  name="description" 
+                  class="form-control" 
+                  required
+                  placeholder="Enter your goal description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" 
+               [(ngModel)]="goalData.startDate" 
+               name="startDate" 
+               class="form-control" 
+               required>
+      </div>
+
+      <div class="form-group">
+        <label>Target End Date</label>
+        <input type="date" 
+               [(ngModel)]="goalData.targetEndDate" 
+               name="targetEndDate" 
+               class="form-control" 
+               required>
+        <div class="validation-message" *ngIf="goalData.startDate && goalData.targetEndDate && !validateDates()">
+          {{getDateValidationMessage()}}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="onClose()">Cancel</button>
+        <button type="submit" class="save-btn" [disabled]="!validateForm()">Save Goal</button>
+      </div>
+    </form>
+  </div>
+</div> 

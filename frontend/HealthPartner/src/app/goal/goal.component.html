@@ -1,0 +1,48 @@
+<div class="goal-container">
+  <div *ngIf="currentGoal" class="goal-content">
+    
+    <div class="main-content">
+      
+      <div class="goal-details">
+        <div class="detail-item">
+          <label>Goal Type:</label>
+          <span>{{currentGoal.goalType.replace('_', ' ')}}</span>
+        </div>
+        <div class="detail-item">
+          <label>Current Weight:</label>
+          <span>{{currentGoal.currentWeight}} kg</span>
+        </div>
+        <div class="detail-item">
+          <label>Target Weight:</label>
+          <span>{{currentGoal.targetWeight}} kg</span>
+        </div>
+        <div class="detail-item">
+          <label>Start Date:</label>
+          <span>{{currentGoal.startDate | date:'mediumDate'}}</span>
+        </div>
+        <div class="detail-item">
+          <label>Target Date:</label>
+          <span>{{currentGoal.targetEndDate | date:'mediumDate'}}</span>
+        </div>
+      </div>
+
+      
+      <div class="progress-circle-container">
+        <div class="progress-circle" [style.--progress]="getRoundedProgress(currentGoal.progress || 0) + '%'">
+          <div class="progress-value">{{getRoundedProgress(currentGoal.progress || 0)}}%</div>
+        </div>
+      </div>
+    </div>
+
+   
+    <div *ngIf="currentGoal?.suggestion" class="suggestion-text" [title]="currentGoal.suggestion">
+      {{currentGoal.suggestion}}
+    </div>
+  </div>
+
+ 
+  <div class="goal-selection" *ngIf="!currentGoal">
+    <p class="no-goal-text">No active goal set</p>
+  </div>
+</div>
+

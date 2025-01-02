@@ -1,0 +1,53 @@
+
+<header class="app-header">
+  <div class="header-content">
+    <div class="left-section">
+      <div class="brand">
+        <span class="app-name">HealthPartner</span>
+      </div>
+      <nav class="main-nav">
+        <a routerLink="/dashboard" class="nav-link" routerLinkActive="active">
+          Dashboard
+        </a>
+        <a routerLink="/fitness" class="nav-link" routerLinkActive="active">
+          Fitness
+        </a>
+        <a routerLink="/diet" class="nav-link" routerLinkActive="active">
+          Diet
+        </a>
+        <a routerLink="/wellness" class="nav-link" routerLinkActive="active">
+          Wellness
+        </a>
+      </nav>
+    </div>
+
+    <div class="right-section">
+      <nav class="nav-links">
+        <!-- Notification icon is already commented out, but I'll show the full commented section for clarity
+        <a routerLink="/notifications" class="nav-link icon-link" routerLinkActive="active">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </a>
+        -->
+        <a routerLink="/leaderboard" class="nav-link icon-link" routerLinkActive="active">
+          <i class="fas fa-trophy"></i>
+        </a>
+        <div class="profile-dropdown">
+          <button class="nav-link icon-link" (click)="toggleProfileMenu($event)">
+            <i class="fas fa-user"></i>
+          </button>
+          <div class="dropdown-menu" [class.show]="isProfileMenuOpen">
+            <a routerLink="/profile" class="dropdown-item">
+              <i class="fas fa-user-circle"></i>
+              Profile
+            </a>
+            <a (click)="logout()" class="dropdown-item">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header> 

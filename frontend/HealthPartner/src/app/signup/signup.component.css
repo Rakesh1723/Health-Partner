@@ -1,0 +1,244 @@
+
+.main-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #000428, #004e92);
+}
+
+.app-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+}
+
+.app-name {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.signup-container {
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.signup-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    padding: 1.4rem;
+    width: 100%;
+    max-width: 550px;
+}
+
+h2 {
+    color: #00e5ff;
+    text-align: center;
+    margin-bottom: 1.2rem;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+}
+
+
+.form-row {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group {
+    margin-bottom: 0.8rem;
+}
+
+.form-control, 
+.form-control:not(:placeholder-shown),
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 6px;
+    color: white !important;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    -webkit-text-fill-color: white !important;
+}
+
+.form-control:focus,
+input:focus,
+select:focus {
+    outline: none;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: #00bcd4;
+    box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.2);
+}
+
+
+.form-control::placeholder,
+input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    opacity: 1;
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300e5ff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+   
+}
+
+.password-input input {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: white !important;
+}
+
+.password-input input:focus {
+    background: rgba(0, 0, 0, 0.4) !important;
+}
+
+
+select.form-control option {
+    background: rgba(0, 0, 0, 0.9);
+    color: white !important;
+    padding: 0.5rem;
+}
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 0.7;
+    background: rgba(0, 229, 255, 0.3);
+}
+
+.password-strength {
+    margin-top: 0.3rem;
+}
+
+.strength-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-bottom: 0.3rem;
+}
+
+.strength-bar .bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.strength-bar.weak .bar {
+    width: 33.33%;
+    background-color: #ef4444;
+}
+
+.strength-bar.medium .bar {
+    width: 66.66%;
+    background-color: #ffd700;
+}
+
+.strength-bar.strong .bar {
+    width: 100%;
+    background-color: #00e5ff;
+}
+
+.strength-text {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+
+.error-message {
+    color: #ff4081;
+    font-size: 0.7rem;
+    margin-top: 0.3rem;
+}
+
+
+.btn-primary {
+    width: 100%;
+    padding: 0.5rem;
+    background: #00bcd4;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #00e5ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
+}
+
+.btn-primary:disabled {
+    background: rgba(0, 188, 212, 0.5);
+    cursor: not-allowed;
+}
+
+
+.login-link {
+    text-align: center;
+    margin-top: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.login-link a {
+    color: #00e5ff;
+    text-decoration: none;
+    margin-left: 0.5rem;
+}
+
+.login-link a:hover {
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+
+.form-group label {
+    display: block;
+     color: white; 
+    margin-bottom: 0.3rem;
+    padding-left: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 5000s;
+    -webkit-text-fill-color: white !important;
+}

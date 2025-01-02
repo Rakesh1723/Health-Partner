@@ -1,0 +1,318 @@
+<div class="main-container">
+  <app-nav-bar></app-nav-bar>
+  
+  
+  <div class="alert-container" 
+       *ngIf="showAlert" 
+       [ngClass]="alertType">
+      <i class="fas" 
+         [ngClass]="{
+           'fa-check-circle': alertType === 'success',
+           'fa-info-circle': alertType === 'info',
+           'fa-exclamation-circle': alertType === 'error'
+         }">
+      </i>
+      <span class="alert-message">{{ alertMessage }}</span>
+  </div>
+
+ 
+  <div class="content-container">
+    <div class="search-section">
+      <div class="day-selector" *ngIf="selectedPeriod === 'Today'">
+        <div class="selected-date" *ngIf="selectedDate">
+          {{ selectedDate | date:'fullDate' }}
+        </div>
+        <div class="week-dates">
+          <div *ngFor="let day of weekDays" 
+               class="day-button" 
+               [class.active]="isSameDay(day.date, selectedDate)"
+               (click)="selectDay(day.date)">
+            <span class="day-name">{{day.name}}</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="date-range" *ngIf="selectedPeriod === 'Custom'">
+        <div class="date-input-container">
+          <input 
+            type="date" 
+            [(ngModel)]="startDate" 
+            class="date-input"
+            [max]="endDate || today"
+            (click)="$event.stopPropagation()">
+          <i class="fas fa-calendar" (click)="openStartDatePicker($event)"></i>
+        </div>
+        <span>to</span>
+        <div class="date-input-container">
+          <input 
+            type="date" 
+            [(ngModel)]="endDate" 
+            class="date-input"
+            [min]="startDate"
+            [max]="today"
+            (click)="$event.stopPropagation()">
+          <i class="fas fa-calendar" (click)="openEndDatePicker($event)"></i>
+        </div>
+        <button class="search-btn" (click)="searchLogs()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+
+      <div class="search-dropdown">
+        <button class="search-toggle" (click)="toggleSearchOptions($event)">
+          <i class="fas fa-filter"></i>
+          <span>{{ selectedPeriod || 'Filter Logs' }}</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="search-options" [class.show]="isSearchOpen">
+          <div class="option" (click)="selectPeriod('Today')">Today</div>
+          <div class="option" (click)="selectPeriod('Weekly')">Weekly</div>
+          <div class="option" (click)="selectPeriod('Monthly')">Monthly</div>
+          <div class="option" (click)="selectPeriod('Yearly')">Yearly</div>
+          <div class="option" (click)="selectPeriod('Custom')">Custom Date</div>
+        </div>
+      </div>
+
+      
+      <div class="goal-settings">
+        <button class="goal-toggle" (click)="toggleGoalSettings()">
+          <i class="fas fa-bullseye"></i>
+          <span>Goal: {{ hasActiveGoal ? (targetSleep !== '00:00' ? targetSleep + 'h/' : '') + 
+            (targetHydration > 0 ? targetHydration + 'L' : '') : 'Not Set' }}</span>
+        </button>
+        
+        <div class="goal-popup" [class.show]="isGoalSettingsOpen">
+          <div class="goal-options" *ngIf="!showGoalInput">
+            <button class="goal-option" (click)="showSetGoal()">
+              <i class="fas fa-plus-circle me-2"></i>Set Goal
+            </button>
+            <button class="goal-option" (click)="unsetGoal()">
+              <i class="fas fa-times-circle me-2"></i>Unset Goal
+            </button>
+          </div>
+          
+          <div class="goal-input-container" *ngIf="showGoalInput">
+            <div class="goal-inputs">
+              <div class="goal-input">
+                <label>Sleep Duration (HH:MM)</label>
+                <input 
+                  type="time" 
+                  [(ngModel)]="targetSleep"
+                  placeholder="Enter target sleep duration">
+              </div>
+              <div class="goal-input">
+                <label>Water Intake (L)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="targetHydration"
+                  placeholder="Enter target water intake">
+              </div>
+            </div>
+            <div class="goal-actions">
+              <button class="goal-action-btn save" (click)="saveGoalSettings()">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="goal-action-btn" (click)="cancelSetGoal()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-bed"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Sleep' : 'Average Sleep' }}</h3>
+          <p class="card-value">{{ viewType === 'daily' ? totalSleep : averageSleep }} hrs</p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="sleepProgress"
+                   [ngClass]="getProgressLevel(sleepProgress)"
+                   [class.empty]="totalSleep === 0">
+                <span class="progress-text">
+                  {{totalSleep > 0 ? sleepProgress + '% of ' + targetSleep + ' hrs goal' : '0 of ' + targetSleep + ' hrs goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-tint"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Hydration' : 'Average Hydration' }}</h3>
+          <p class="card-value">{{ viewType === 'daily' ? totalHydration : averageHydration }} L</p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="hydrationProgress"
+                   [ngClass]="getProgressLevel(hydrationProgress)"
+                   [class.empty]="totalHydration === 0">
+                <span class="progress-text">
+                  {{totalHydration > 0 ? hydrationProgress + '% of ' + targetHydration + ' L goal' : '0 of ' + targetHydration + ' L goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!hasLogs" class="no-entries-box">
+      <p>No wellness entries found for this period</p>
+    </div>
+
+    <div class="logs-grid">
+      <div class="log-tile" *ngFor="let log of wellnessLogs">
+        <div class="wellness-info">
+          <div class="mood-type">
+            <i class="fas" [ngClass]="getMoodIcon(log.mood)"></i>
+            <span>{{log.mood}}</span>
+          </div>
+          
+          <div class="log-stats">
+            <div class="triggers">
+              <span class="trigger" *ngFor="let trigger of log.triggers">{{trigger}}</span>
+            </div>
+            
+            <div class="stat">
+              <i class="fas fa-bed"></i>
+              <span>{{log.sleepDuration}} hrs</span>
+            </div>
+            
+            <div class="stat">
+              <i class="fas fa-tint"></i>
+              <span>{{log.hydration}} L</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="log-actions">
+          <span class="log-date">{{log.createdAt | date:'mediumDate'}}</span>
+          <div class="action-buttons">
+            <button class="edit-btn" (click)="openEditModal(log)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-btn" (click)="deleteWellnessLog(log.logId)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <button class="floating-add-btn" (click)="openAddModal()">
+      <i class="fas fa-plus"></i>
+    </button>
+  </div>
+</div>
+
+
+<div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="logModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logModalLabel">
+          <i class="fas fa-heart me-2"></i>
+          {{isEditing ? 'Edit' : 'Add New'}} Wellness Log
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="logForm">
+          <div class="form-group">
+            <label>
+              <i class="fas fa-smile me-2"></i>
+              Mood
+            </label>
+            <select class="form-control" formControlName="mood">
+              <option *ngFor="let mood of moods" [value]="mood">
+                {{mood}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-exclamation-circle me-2"></i>
+              Triggers
+            </label>
+            <div formArrayName="triggers">
+              <div *ngFor="let trigger of triggers.controls; let i=index" [formGroupName]="i" class="trigger-row">
+                <input type="text" class="form-control" formControlName="item" placeholder="Enter trigger">
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeTrigger(i)" *ngIf="triggers.length > 1">
+                  <i class="fas fa-times"></i>
+                </button>
+                <button *ngIf="i === triggers.length - 1" type="button" class="btn btn-add" (click)="addTrigger()">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-bed me-2"></i>
+              Sleep Duration (hours)
+            </label>
+            <input type="number" class="form-control" formControlName="sleepDuration">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-tint me-2"></i>
+              Hydration (liters)
+            </label>
+            <input type="number" class="form-control" formControlName="hydration">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-sticky-note me-2"></i>
+              Notes
+            </label>
+            <textarea class="form-control" formControlName="notes" placeholder="Add any additional notes here..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <i class="fas fa-calendar me-2"></i>
+              Date
+            </label>
+            <input type="date" 
+                   class="form-control" 
+                   formControlName="logDate"
+                   [max]="maxDate"
+                   [disabled]="isEditing"
+                   [class.disabled]="isEditing"
+                   placeholder="Select date">
+            <div class="invalid-feedback" *ngIf="logForm.get('logDate')?.errors?.['required']">
+              Date is required
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveLog()">
+          <i class="fas" [ngClass]="isEditing ? 'fa-save' : 'fa-plus'"></i>
+          <span class="ms-2">{{isEditing ? 'Update' : 'Save'}}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

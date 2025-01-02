@@ -1,0 +1,196 @@
+<div class="main-container">
+  <app-nav-bar></app-nav-bar>
+
+  <div class="profile-section">
+    <div class="info-tile profile-info">
+      <div class="tile-header">
+        <div class="header-left">
+          <i class="fas fa-id-card"></i>
+          <span>Profile Information</span>
+        </div>
+        <div class="header-actions">
+          <button *ngIf="!isEditing" 
+                  class="edit-profile-btn" 
+                  (click)="toggleEdit()">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <ng-container *ngIf="isEditing">
+            <button class="save-btn" (click)="saveChanges()">
+              <i class="fas fa-check"></i> Save
+            </button>
+            <button class="cancel-btn" (click)="toggleEdit()">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="profile-content">
+        <!-- Left Side - Profile Image -->
+        <div class="profile-image-side">
+          <div class="profile-image-container">
+            <div class="default-profile-icon" *ngIf="!profileImageUrl || profileImageUrl === 'assets/default-profile.jpg'">
+              <i class="fas fa-user"></i>
+            </div>
+            <img [src]="profileImageUrl" 
+                 alt="Profile Picture" 
+                 class="profile-image"
+                 *ngIf="profileImageUrl && profileImageUrl !== 'assets/default-profile.jpg'">
+            <div *ngIf="isEditing" class="image-upload-overlay" (click)="fileInput.click()">
+              <span class="upload-icon">📷</span>
+              <span class="upload-text">Change</span>
+            </div>
+            <input #fileInput 
+                   type="file" 
+                   hidden 
+                   accept="image/*"
+                   (change)="onImageSelected($event)">
+          </div>
+        </div>
+
+        <!-- Right Side - Profile Details -->
+        <div class="profile-details-side">
+          <!-- Non-editing view -->
+          <div *ngIf="!isEditing">
+            <div class="profile-name">{{profileData.userName}} {{profileData.surName}}</div>
+            <div class="profile-email">{{profileData.emailId}}</div>
+          </div>
+
+          <!-- Editing view -->
+          <div *ngIf="isEditing && profileData" class="edit-inputs">
+            <input type="text" [(ngModel)]="profileData.userName" class="edit-input" placeholder="First Name">
+            <input type="text" [(ngModel)]="profileData.surName" class="edit-input" placeholder="Last Name">
+            <input type="email" [(ngModel)]="profileData.emailId" class="edit-input" placeholder="Email">
+          </div>
+        </div>
+      </div>
+
+      <div class="last-updated">
+        Last Updated: {{profileData.updatedAt | date:'medium'}}
+      </div>
+    </div>
+
+    <div class="tiles-container">
+      <div class="info-tile personal-info">
+        <div class="tile-header">
+          <div class="header-left">
+            <i class="fas fa-user"></i>
+            <span>Personal Information</span>
+          </div>
+        </div>
+        <div class="tile-content">
+          <!-- Non-editing view -->
+          <div *ngIf="!isEditing" class="info-row">
+            <span class="info-label">Mobile</span>
+            <span class="info-value">{{profileData.mobileNo}}</span>
+          </div>
+          <div *ngIf="!isEditing" class="info-row">
+            <span class="info-label">Age</span>
+            <span class="info-value">{{profileData.age}} years</span>
+          </div>
+          <div *ngIf="!isEditing" class="info-row">
+            <span class="info-label">Gender</span>
+            <span class="info-value">{{profileData.gender}}</span>
+          </div>
+          
+          <!-- Editing view -->
+          <div *ngIf="isEditing && profileData" class="info-row">
+            <span class="info-label">Mobile</span>
+            <input type="tel" [(ngModel)]="profileData.mobileNo" class="edit-input" placeholder="Mobile Number">
+          </div>
+          <div *ngIf="isEditing && profileData" class="info-row">
+            <span class="info-label">Age</span>
+            <input type="number" [(ngModel)]="profileData.age" class="edit-input" placeholder="Age">
+          </div>
+          <div *ngIf="isEditing && profileData" class="info-row">
+            <span class="info-label">Gender</span>
+            <select [(ngModel)]="profileData.gender" class="edit-input gender-select">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-tile health-metrics">
+        <div class="tile-header">
+          <div class="header-left">
+            <i class="fas fa-heartbeat"></i>
+            <span>Health Metrics</span>
+          </div>
+        </div>
+        <div class="tile-content">
+          <!-- Non-editing view -->
+          <div *ngIf="!isEditing" class="info-row">
+            <span class="info-label">Height</span>
+            <span class="info-value">{{profileData.height}} m</span>
+          </div>
+          <div *ngIf="!isEditing" class="info-row">
+            <span class="info-label">Weight</span>
+            <span class="info-value">{{profileData.weight}} kg</span>
+          </div>
+          
+          <!-- Editing view -->
+          <div *ngIf="isEditing && profileData" class="info-row">
+            <span class="info-label">Height</span>
+            <input type="number" 
+                   [(ngModel)]="profileData.height" 
+                   (ngModelChange)="onHeightWeightChange()"
+                   class="edit-input" 
+                   placeholder="Height in m">
+          </div>
+          <div *ngIf="isEditing && profileData" class="info-row">
+            <span class="info-label">Weight</span>
+            <input type="number" 
+                   [(ngModel)]="profileData.weight" 
+                   (ngModelChange)="onHeightWeightChange()"
+                   class="edit-input" 
+                   placeholder="Weight in kg">
+          </div>
+
+          <div class="bmi-label">
+            <i class="fas fa-chart-line"></i>
+            <span>BMI Index</span>
+          </div>
+          <div class="bmi-section">
+            <div class="bmi-gauge">
+              <div class="gauge-needle" [style.transform]="'rotate(' + (profileData ? getBMINeedleRotation() : 0) + 'deg)'"></div>
+            </div>
+            <div class="bmi-details" *ngIf="profileData">
+              <div class="bmi-value">{{profileData.bmiIndex | number:'1.1-1'}}</div>
+              <div class="bmi-category">{{profileData.bmiCategory}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-tile address-info">
+        <div class="tile-header">
+          <div class="header-left">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Address</span>
+          </div>
+        </div>
+        <div class="tile-content">
+          <!-- Non-editing view -->
+          <div *ngIf="!isEditing" class="info-row">
+            <span class="info-label">Current Address</span>
+            <div class="address-text">{{profileData.address}}</div>
+          </div>
+          
+          <!-- Editing view -->
+          <div *ngIf="isEditing && profileData" class="info-row full-width-row">
+            <span class="info-label">Current Address</span>
+            <div class="address-input-container">
+              <textarea [(ngModel)]="profileData.address" 
+                       class="edit-input address-input" 
+                       placeholder="Enter your complete address"
+                       rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

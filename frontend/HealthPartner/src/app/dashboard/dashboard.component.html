@@ -1,0 +1,215 @@
+<div class="main-container">
+  <app-nav-bar></app-nav-bar>
+
+  <div class="dashboard-content">
+    
+    <div class="welcome-section">
+      <h1>Welcome back, <span class="user-name">{{userName || 'User'}}</span></h1>
+      <p class="date">{{ currentDate | date:'fullDate' }}</p>
+    </div>
+
+
+    
+    <div class="chart-row">
+      <div class="chart-container analytics-chart">
+        <div class="chart-header">
+          <h2>Calories Analysis</h2>
+          <div class="chart-actions">
+            <div class="view-toggles" *ngIf="selectedPeriod !== 'week'">
+              <label class="toggle-label">
+                <input type="radio" 
+                       name="caloriesViewType" 
+                       value="total" 
+                       [(ngModel)]="viewType" 
+                       (change)="onViewTypeChange()">
+                Total
+              </label>
+              <label class="toggle-label">
+                <input type="radio" 
+                       name="caloriesViewType" 
+                       value="average" 
+                       [(ngModel)]="viewType" 
+                       (change)="onViewTypeChange()">
+                Average
+              </label>
+            </div>
+            <select class="period-select" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()">
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-content">
+          <app-calories-analysis-chart
+            [selectedPeriod]="selectedPeriod"
+            [viewType]="viewType">
+          </app-calories-analysis-chart>
+        </div>
+      </div>
+
+      <div class="chart-container analytics-chart">
+        <div class="chart-header">
+          <h2>Goal</h2>
+          <div class="goal-actions">
+            <div class="dropdown" (click)="$event.stopPropagation()">
+              <button class="set-goal-btn" (click)="toggleGoalDropdown($event)">
+                Set Goal
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="dropdown-menu" [class.show]="showGoalDropdown">
+                <div class="dropdown-item" (click)="onSelectGoalType('WEIGHT_GAIN')">Weight Gain</div>
+                <div class="dropdown-item" (click)="onSelectGoalType('WEIGHT_LOSS')">Weight Loss</div>
+                <div class="dropdown-item unset-option" (click)="onUnsetGoal()">Unset Goal</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-content">
+          <app-goal></app-goal>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="chart-row">
+      
+      <div class="chart-container analytics-chart">
+        <div class="chart-header">
+          <h2>Macronutrients Analysis</h2>
+          <div class="chart-actions">
+            <div class="view-toggles" *ngIf="macrosPeriod !== 'week'">
+              <label class="toggle-label">
+                <input type="radio" 
+                       name="macrosViewType" 
+                       value="total" 
+                       [(ngModel)]="macrosViewType" 
+                       (change)="onMacrosViewTypeChange()">
+                Total
+              </label>
+              <label class="toggle-label">
+                <input type="radio" 
+                       name="macrosViewType" 
+                       value="average" 
+                       [(ngModel)]="macrosViewType" 
+                       (change)="onMacrosViewTypeChange()">
+                Average
+              </label>
+            </div>
+            <select class="period-select" [(ngModel)]="macrosPeriod" (change)="onMacrosPeriodChange()">
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-content">
+          <app-macronutrients-chart
+            [selectedPeriod]="macrosPeriod"
+            [viewType]="macrosViewType">
+          </app-macronutrients-chart>
+        </div>
+      </div>
+
+     
+      <div class="chart-container analytics-chart">
+        <div class="chart-header">
+          <h2>Sleep Analysis</h2>
+          <div class="chart-actions">
+            <div class="view-toggles" *ngIf="sleepPeriod !== 'week'">
+              <label class="toggle-label">
+                <input type="radio" 
+                       name="sleepViewType" 
+                       value="total" 
+                       [(ngModel)]="sleepViewType" 
+                       (change)="onSleepViewTypeChange()">
+                Total
+              </label>
+              <label class="toggle-label">
+                <input type="radio" 
+                       name="sleepViewType" 
+                       value="average" 
+                       [(ngModel)]="sleepViewType" 
+                       (change)="onSleepViewTypeChange()">
+                Average
+              </label>
+            </div>
+            <select class="period-select" [(ngModel)]="sleepPeriod" (change)="onSleepPeriodChange()">
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-content">
+          <app-sleep-analysis-chart
+            [selectedPeriod]="sleepPeriod"
+            [viewType]="sleepViewType">
+          </app-sleep-analysis-chart>
+        </div>
+      </div>
+    </div>
+
+   
+    <div class="summary-section">
+      <h2>Weekly Summary</h2>
+      <div class="summary-cards">
+        <div class="summary-card calories-card">
+          <i class="fas fa-fire-alt"></i>
+          <div class="card-content">
+            <h3>Daily Avg Calories</h3>
+            <div class="calories-breakdown">
+              <p><span class="label">Consumed:</span> <span class="value">{{totalCaloriesConsumed}}</span></p>
+              <p><span class="label">Burned:</span> <span class="value">{{totalCaloriesBurned}}</span></p>
+              <p class="trend" [ngClass]="{'positive': caloriesTrend.isPositive, 'negative': !caloriesTrend.isPositive}">
+                {{caloriesTrend.isPositive ? '+' : '-'}}{{caloriesTrend.value}}% vs last week
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <i class="fas fa-running"></i>
+          <div class="card-content">
+            <h3>Avg Workout Duration</h3>
+            <p class="value">{{formatDuration(avgWorkoutDuration)}}</p>
+            <p class="trend" [ngClass]="{'positive': workoutTrend.isPositive, 'negative': !workoutTrend.isPositive}">
+              {{workoutTrend.isPositive ? '+' : '-'}}{{workoutTrend.value}}% vs last week
+            </p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <i class="fas fa-bed"></i>
+          <div class="card-content">
+            <h3>Avg Sleep</h3>
+            <p class="value">{{avgSleepHours}}h</p>
+            <p class="trend" [ngClass]="{'positive': sleepTrend.isPositive, 'negative': !sleepTrend.isPositive}">
+              {{sleepTrend.isPositive ? '+' : '-'}}{{sleepTrend.value}}% vs last week
+            </p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <i class="fas fa-tint"></i>
+          <div class="card-content">
+            <h3>Avg Water Intake</h3>
+            <p class="value">{{avgWaterIntake}}L</p>
+            <p class="trend" [ngClass]="{'positive': waterTrend.isPositive, 'negative': !waterTrend.isPositive}">
+              {{waterTrend.isPositive ? '+' : '-'}}{{waterTrend.value}}% vs last week
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showGoalModal" (click)="onModalClose()"></div>
+  <app-goal-edit-modal
+    [show]="showGoalModal"
+    [goalType]="selectedGoalType"
+    [currentGoal]="currentGoal"
+    (close)="onModalClose()"
+    (save)="onModalSave($event)">
+  </app-goal-edit-modal>
+</div>

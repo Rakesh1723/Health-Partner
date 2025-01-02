@@ -1,0 +1,37 @@
+<div class="main-container">
+  <app-nav-bar></app-nav-bar>
+  <div class="leaderboard-container">
+    <div class="leaderboard-header">
+      <h1>Leaderboard</h1>
+    </div>
+    
+    <div class="leaderboard-grid">
+      @for (user of paginatedData; track user.userId; let i = $index) {
+        <div class="user-tile" [class]="getBadgeClass(i + (currentPage * itemsPerPage))">
+          <div class="rank">
+            #{{ i + 1 + (currentPage * itemsPerPage) }}
+            @if (i + (currentPage * itemsPerPage) < 3) {
+              <div class="badge" [class]="getBadgeClass(i + (currentPage * itemsPerPage))">
+                <i class="fas fa-medal"></i>
+              </div>
+            }
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{ user.userName }}</div>
+            <div class="score">{{ formatScore(user.score) }} pts</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="pagination">
+      <button (click)="previousPage()" [disabled]="currentPage === 0">
+        <i class="fas fa-arrow-left"></i> Previous
+      </button>
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1">
+        Next <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

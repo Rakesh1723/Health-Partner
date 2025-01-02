@@ -1,0 +1,137 @@
+<div class="main-container">
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <span class="app-name">HealthPartner</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="app-title">HealthPartner</h1>
+        <p class="text-muted">Welcome back!</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="form-group">
+          <label for="userEmail">Email</label>
+          <input type="email" 
+                 class="form-control" 
+                 id="userEmail" 
+                 formControlName="userEmail"
+                 placeholder="Enter email"
+                 autocomplete="off"
+                 autocapitalize="off"
+                 autocorrect="off"
+                 spellcheck="false">
+          <div class="error-message" *ngIf="loginForm.get('userEmail')?.touched && loginForm.get('userEmail')?.invalid">
+            <small *ngIf="loginForm.get('userEmail')?.errors?.['required']">Email is required</small>
+            <small *ngIf="loginForm.get('userEmail')?.errors?.['email']">Please enter a valid email</small>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="d-flex justify-content-between align-items-center">
+            <label for="password">Password</label>
+            <a href="#" class="forgot-link" (click)="openForgotPasswordModal($event)">Forgot Password?</a>
+          </div>
+          <div class="password-input-group">
+            <input [type]="showPassword ? 'text' : 'password'"
+                   class="form-control" 
+                   id="password"
+                   formControlName="password"
+                   placeholder="Enter password"
+                   autocomplete="new-password"
+                   autocapitalize="off"
+                   autocorrect="off">
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+              <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <div class="error-message">
+            <small *ngIf="loginError">{{loginError}}</small>
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn" [disabled]="loginForm.invalid">Login</button>
+        
+        <div class="register-link">
+          Don't have an account? 
+          <a routerLink="/signup">Sign up</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="resetPasswordForm" (ngSubmit)="onResetPassword()" autocomplete="off">
+          <div class="form-group">
+            <label for="resetEmail">Email</label>
+            <input type="email" 
+                   class="form-control" 
+                   id="resetEmail" 
+                   formControlName="email"
+                   placeholder="Enter email"
+                   autocomplete="off"
+                   autocapitalize="off"
+                   autocorrect="off"
+                   spellcheck="false">
+            <div class="error-message" *ngIf="resetPasswordForm.get('email')?.touched && resetPasswordForm.get('email')?.invalid">
+              <small *ngIf="resetPasswordForm.get('email')?.errors?.['required']">Email is required</small>
+              <small *ngIf="resetPasswordForm.get('email')?.errors?.['email']">Please enter a valid email</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" 
+                   class="form-control" 
+                   id="newPassword"
+                   formControlName="newPassword"
+                   placeholder="Enter new password"
+                   autocomplete="new-password"
+                   autocapitalize="off"
+                   autocorrect="off">
+            <div class="error-message" *ngIf="resetPasswordForm.get('newPassword')?.touched && resetPasswordForm.get('newPassword')?.invalid">
+              <small *ngIf="resetPasswordForm.get('newPassword')?.errors?.['required']">Password is required</small>
+              <small *ngIf="resetPasswordForm.get('newPassword')?.errors?.['pattern']">Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character</small>
+              <small *ngIf="resetPasswordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 8 characters</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" 
+                   class="form-control" 
+                   id="confirmPassword"
+                   formControlName="confirmPassword"
+                   placeholder="Confirm new password"
+                   autocomplete="new-password"
+                   autocapitalize="off"
+                   autocorrect="off">
+            <div class="error-message" *ngIf="resetPasswordForm.get('confirmPassword')?.touched && resetPasswordForm.get('confirmPassword')?.invalid">
+              <small *ngIf="resetPasswordForm.get('confirmPassword')?.errors?.['required']">Confirm password is required</small>
+              <small *ngIf="resetPasswordForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</small>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="resetPasswordForm.invalid">Update Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

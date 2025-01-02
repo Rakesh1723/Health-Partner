@@ -1,0 +1,352 @@
+<div class="main-container">
+  <app-nav-bar></app-nav-bar>
+ 
+  <div class="content-container">
+   
+    <div class="search-section">
+     
+      <div class="goal-settings">
+        <button class="goal-toggle" (click)="toggleGoalSettings()">
+          <i class="fas fa-bullseye"></i>
+          <span>Goal: {{ hasActiveGoal ? targetCalories + ' cal' : 'Not Set' }}</span>
+        </button>
+        
+        <div class="goal-popup" [class.show]="isGoalSettingsOpen">
+          <div class="goal-options" *ngIf="!showGoalInput">
+            <button class="goal-option" (click)="showSetGoal()">
+              <i class="fas fa-plus-circle me-2"></i>Set Goal
+            </button>
+            <button class="goal-option" (click)="unsetGoal()">
+              <i class="fas fa-times-circle me-2"></i>Unset Goal
+            </button>
+          </div>
+          
+          <div class="goal-input-container" *ngIf="showGoalInput">
+            <div class="goal-input">
+              <input 
+                type="number" 
+                [(ngModel)]="targetCalories"
+                placeholder="Enter target calories">
+            </div>
+            <button class="goal-action-btn save" (click)="saveGoalSettings()">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="goal-action-btn" (click)="cancelSetGoal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="day-selector" *ngIf="selectedPeriod === 'Today'">
+        <div class="selected-date" *ngIf="selectedDate">
+          {{ selectedDate | date:'fullDate' }}
+        </div>
+        <div class="week-dates">
+          <div *ngFor="let day of weekDays" 
+               class="day-button" 
+               [class.active]="isSameDay(day.date, selectedDate)"
+               (click)="selectDay(day.date)">
+            <span class="day-name">{{day.name}}</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="search-controls">
+        <div class="search-dropdown">
+          <button class="search-toggle" (click)="toggleSearchOptions($event)">
+            <i class="fas fa-filter"></i>
+            <span>{{ selectedPeriod }}</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="search-options" [class.show]="isSearchOpen">
+            <div class="option" (click)="selectPeriod('Today')">Today</div>
+            <div class="option" (click)="selectPeriod('Weekly')">Weekly</div>
+            <div class="option" (click)="selectPeriod('Monthly')">Monthly</div>
+            <div class="option" (click)="selectPeriod('Yearly')">Yearly</div>
+            <div class="option" (click)="selectPeriod('Custom')">Custom Date</div>
+          </div>
+        </div>
+
+        
+        <div class="date-range" *ngIf="selectedPeriod === 'Custom'">
+          <div class="date-input-container">
+            <input 
+              type="date" 
+              [(ngModel)]="startDate" 
+              class="date-input"
+              [max]="endDate || today"
+              (click)="$event.stopPropagation()">
+            <i class="fas fa-calendar" (click)="openStartDatePicker($event)"></i>
+          </div>
+          <span>to</span>
+          <div class="date-input-container">
+            <input 
+              type="date" 
+              [(ngModel)]="endDate" 
+              class="date-input"
+              [min]="startDate"
+              [max]="today"
+              (click)="$event.stopPropagation()">
+            <i class="fas fa-calendar" (click)="openEndDatePicker($event)"></i>
+          </div>
+          <button class="search-btn" (click)="searchLogs()">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Duration' : 'Average Duration' }}</h3>
+          <p class="card-value">
+            {{ formatDuration(viewType === 'daily' ? totalDuration : averageDuration) }}
+          </p>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-fire-alt"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ viewType === 'daily' ? 'Total Calories' : 'Average Calories' }}</h3>
+          <p class="card-value">
+            {{ viewType === 'daily' ? totalCalories : averageCalories }} cal
+          </p>
+          <div *ngIf="hasActiveGoal && viewType === 'daily'">
+            <div class="progress-container">
+              <div class="progress-bar" 
+                   [style.width.%]="calorieProgress"
+                   [ngClass]="getProgressLevel(calorieProgress)">
+                <span class="progress-text">
+                  {{totalCalories > 0 ? calorieProgress + '% of ' + targetCalories + ' cal goal' : '0 of ' + targetCalories + ' cal goal'}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="card-subtitle" *ngIf="viewType === 'average'">per day</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!hasLogs" class="no-entries-box">
+      <p>No fitness entries found for this period</p>
+    </div>
+
+    
+    <div class="logs-grid">
+      <div class="log-tile" *ngFor="let log of fitnessLogs">
+        <div class="workout-info">
+          <div class="workout-type">
+            <i class="fas" [ngClass]="getActivityIcon(log.workoutType)"></i>
+            <div class="field-group">
+              <span class="field-label">Workout Type</span>
+              <span class="field-value">{{log.workoutType.replace('_', ' ')}}</span>
+            </div>
+          </div>
+          
+          <div class="log-stats">
+            <div class="stat-group">
+              <span class="field-label">Intensity</span>
+              <span class="intensity-badge" [ngClass]="log.workoutIntensity.toLowerCase()">
+                <i class="fas" [ngClass]="getIntensityIcon(log.workoutIntensity)"></i>
+                {{log.workoutIntensity}}
+              </span>
+            </div>
+            
+            <div class="stat-group">
+              <span class="field-label">Duration</span>
+              <div class="stat">
+                <i class="fas fa-clock"></i>
+                <span>{{log.duration}} mins</span>
+              </div>
+            </div>
+            
+            <div class="stat-group">
+              <span class="field-label">Calories</span>
+              <div class="stat">
+                <i class="fas fa-fire"></i>
+                <span>{{log.caloriesBurned}} cal</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="log-actions">
+          <span class="log-date">{{log.createdAt | date:'mediumDate'}}</span>
+          <div class="action-buttons">
+            <button class="edit-btn" (click)="openEditModal(log)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-btn" (click)="deleteFitnessLog(log.logId)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <button class="floating-add-btn" (click)="openAddModal()">
+      <i class="fas fa-plus"></i>
+    </button>
+  </div>
+</div>
+
+
+<div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="logModalLabel">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" [ngClass]="{'success': showSuccessView}">
+        <h5 class="modal-title" id="logModalLabel">
+          <i class="fas fa-dumbbell me-2"></i>
+          {{showSuccessView ? (isEditing ? 'Workout Updated' : 'Workout Added') : (isEditing ? 'Edit Workout' : 'Add New Workout')}}
+        </h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      
+     
+      <div class="modal-body py-2" *ngIf="showSuccessView && savedWorkout">
+        <div class="workout-details">
+          <div class="detail-item">
+            <i class="fas" [ngClass]="getActivityIcon(savedWorkout.workoutType)"></i>
+            <span class="detail-label">Workout Type:</span>
+            <span class="detail-value">{{savedWorkout.workoutType.replace('_', ' ')}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-clock"></i>
+            <span class="detail-label">Duration:</span>
+            <span class="detail-value">{{savedWorkout.duration}} mins</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-fire"></i>
+            <span class="detail-label">Calories Burned:</span>
+            <span class="detail-value">{{savedWorkout.caloriesBurned}} cal</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas" [ngClass]="getIntensityIcon(savedWorkout.workoutIntensity)"></i>
+            <span class="detail-label">Intensity:</span>
+            <span class="detail-value">{{savedWorkout.workoutIntensity}}</span>
+          </div>
+          <div class="detail-item" *ngIf="savedWorkout.notes">
+            <i class="fas fa-sticky-note"></i>
+            <span class="detail-label">Notes:</span>
+            <span class="detail-value">{{savedWorkout.notes}}</span>
+          </div>
+          <div class="log-date mt-2 text-end">
+            {{savedWorkout.createdAt | date:'mediumDate'}}
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="modal-body py-2" *ngIf="!showSuccessView">
+        <form [formGroup]="logForm">
+          <div class="form-group mb-1">
+            <label class="form-label small">
+              <i class="fas fa-running me-2"></i>
+              Workout Type
+            </label>
+            <select class="form-control form-control-sm py-1" formControlName="workoutType">
+              <option value="">Select workout type</option>
+              <option *ngFor="let type of activityTypes" [value]="type">
+                {{type.replace('_', ' ')}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group mb-1">
+            <label class="form-label small">
+              <i class="fas fa-clock me-2"></i>
+              Duration (minutes)
+            </label>
+            <input type="number" 
+                   class="form-control form-control-sm py-1" 
+                   formControlName="duration"
+                   placeholder="Enter duration in minutes">
+          </div>
+
+          <div class="form-group mb-1">
+            <label class="form-label small">
+              <i class="fas fa-fire me-2"></i>
+              Intensity
+            </label>
+            <select class="form-control form-control-sm py-1" formControlName="workoutIntensity">
+              <option value="">Select intensity level</option>
+              <option *ngFor="let intensity of intensityLevels" [value]="intensity">
+                {{intensity}}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group mb-1">
+            <label class="form-label small">
+              <i class="fas fa-calendar me-2"></i>
+              Date
+            </label>
+            <input type="date" 
+                   class="form-control form-control-sm py-1" 
+                   formControlName="logDate"
+                   [max]="maxDate"
+                   [disabled]="isEditing"
+                   [class.disabled]="isEditing"
+                   placeholder="Select date">
+            <div class="invalid-feedback" *ngIf="logForm.get('logDate')?.errors?.['required']">
+              Date is required
+            </div>
+          </div>
+
+          <div class="form-group mb-1">
+            <label class="form-label small">
+              <i class="fas fa-sticky-note me-2"></i>
+              Notes
+            </label>
+            <textarea class="form-control form-control-sm py-1" 
+                      formControlName="notes" 
+                      placeholder="Add any additional notes here..." 
+                      rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      
+      <div class="modal-footer py-1">
+        <button type="button" class="btn btn-secondary btn-sm py-1" (click)="closeModal()">
+          <i class="fas" [ngClass]="showSuccessView ? 'fa-times' : 'fa-times'"></i>
+          <span class="ms-2">{{showSuccessView ? 'Close' : 'Cancel'}}</span>
+        </button>
+        <button type="button" 
+                class="btn btn-primary btn-sm py-1"
+                (click)="isEditing ? updateLog() : saveLog()"
+                *ngIf="!showSuccessView"
+                [disabled]="!logForm.valid || isCalculatingCalories">
+          <i class="fas fa-spinner fa-spin me-2" *ngIf="isCalculatingCalories"></i>
+          <i class="fas" *ngIf="!isCalculatingCalories" [ngClass]="isEditing ? 'fa-save' : 'fa-plus'"></i>
+          <span class="ms-2">{{isCalculatingCalories ? 'Calculating...' : (isEditing ? 'Update' : 'Save')}}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="alert-container" 
+     *ngIf="showNotification" 
+     [ngClass]="alertType">
+    <i class="fas" 
+       [ngClass]="{
+         'fa-check-circle': alertType === 'success',
+         'fa-info-circle': alertType === 'info',
+         'fa-exclamation-circle': alertType === 'error'
+       }">
+    </i>
+    <span class="alert-message">{{ notificationMessage }}</span>
+</div>
