@@ -1,0 +1,5 @@
+package com.healthpartner.users.dto;
+
+public enum Mood {
+    HAPPY,SAD,STRESSED,BORED,FRUSTRATED,LONELY,DEPRESSED,ANXIOUS,EXCITED,IRRITABLE,ENERGETIC,CALM,TIRED
+}

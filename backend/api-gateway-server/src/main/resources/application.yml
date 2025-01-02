@@ -1,0 +1,54 @@
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
+#  instance:
+#    prefer-ip-address: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${RDS_HOSTNAME:localhost}:${RDS_PORT:5432}/${RDS_DB_NAME:cp_db}
+    username: ${RDS_USERNAME:postgres}
+    password: ${RDS_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: user-service
+            uri:
+              lb://user-service
+            predicates:
+              - Path=/api/v1/users/**
+
+          - id: fitness-service
+            uri:
+              lb://fitness-service
+            predicates:
+              - Path=/api/v1/fitnessLogs/**
+
+          - id: diet-service
+            uri:
+              lb://diet-service
+            predicates:
+              - Path=/api/v1/dietLogs/**
+
+          - id: wellness-service
+            uri:
+              lb://wellness-service
+            predicates:
+              - Path=/api/v1/wellnessLogs/**
+
+          - id: goal-service
+            uri:
+              lb://goal-service
+            predicates:
+              - Path=/api/v1/goalLogs/**

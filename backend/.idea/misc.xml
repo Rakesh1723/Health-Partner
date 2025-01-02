@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/diet-service/pom.xml" />
+        <option value="$PROJECT_DIR$/user-service/pom.xml" />
+        <option value="$PROJECT_DIR$/eureka-server/pom.xml" />
+        <option value="$PROJECT_DIR$/fitness-service/pom.xml" />
+        <option value="$PROJECT_DIR$/wellness-service/pom.xml" />
+        <option value="$PROJECT_DIR$/api-gateway-server/pom.xml" />
+        <option value="$PROJECT_DIR$/dashboard-service/pom.xml" />
+        <option value="$PROJECT_DIR$/goal-service/pom.xml" />
+        <option value="$PROJECT_DIR$/../../Springfiles/auth-service/api-gateway-server/pom.xml" />
+        <option value="$PROJECT_DIR$/api-gateway/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/../../Springfiles/auth-service/api-gateway-server/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
